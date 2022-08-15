@@ -1,0 +1,50 @@
+#define Led_1 3   //Definir os pinos dos leds
+#define Led_2 4
+int Button = 12;
+int estateButton;
+int Count = 0;                  
+
+unsigned long LedsSequence[2];
+unsigned long lastDebounceTime = 0;
+unsigned long debounceDelay = 70; //Função debounce para evitar que o botão seja apertado sem querer evitando o delay()
+
+void setup() {
+  pinMode(Led_1, OUTPUT);
+  pinMode(Led_2, OUTPUT);  
+  pinMode(Button, INPUT_PULLUP);
+  Serial.begin(9600);      
+}
+void loop() {
+
+    if (digitalRead(Button) == 0 ){ // Verifica se o botão direito foi acionado     
+    if ((millis() - lastDebounceTime) > debounceDelay){
+      Count++; //Número ultilizado para a lógica.
+      Serial.println(Count);
+    }
+    lastDebounceTime = millis();
+  }
+
+  if (Count == 0){ //Estado inicial
+     BlinkLed(Led_1, 500, 0);
+     digitalWrite(Led_2, LOW); 
+  }
+  if (Count == 1){
+     BlinkLed(Led_2, 500, 1);
+     digitalWrite(Led_1, LOW); 
+  }
+  if (Count % 2 == 0 && Count != 0){
+     BlinkLed(Led_1, 250, 0);
+     digitalWrite(Led_2, LOW); 
+  }
+  if (Count % 2 == 1 && Count != 1){
+     BlinkLed(Led_2, 250, 1);
+     digitalWrite(Led_1, LOW);  
+  }
+}
+
+void BlinkLed (int led, int interval, int array){  //Função criada. Pede o nome da variável, o intervalo em ms e a posição em que ele está na lista.
+   if (((long)millis() - LedsSequence[array]) >= interval){  //Função Milis
+    LedsSequence[array]= millis();                            
+    digitalWrite(led, !digitalRead(led));                     
+  }
+ }
